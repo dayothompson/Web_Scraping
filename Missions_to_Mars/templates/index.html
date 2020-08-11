@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mission to Mars</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+</head>
+<body>
+        <div class="container">
+                <div class="jumbotron">
+                    <h1 style="text-align: center;">Mission to Mars</h1>
+
+                    <p style="text-align: center;">
+                        <a class="btn btn-primary btn-lg" href="/scrape" role="button">Scrape New Data</a>
+                    </p>
+                </div>
+                <div class="page-header">
+                    <h1>Latest Mars News</h1>
+                </div>
+{#        </div>#}
+
+                {% for data in mars_data %}
+                <div class="container-fluid">
+                    <h2>{{data.news_title}}</h2>
+                    <p>{{data.news_article}}</p>
+                </div>
+
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <h3>Featured Mars Image</h3>
+
+                            <img src="{{data.featured_image_url}}" alt="featured image" style="width: 80%;">
+
+                        </div>
+                        <div class="col-md-5">
+                            <ul>
+                                <h3>Current Mars Weather</h3>
+                                {{data.latest_tweet}}
+                            </ul>
+
+{##}
+{#                            <ul>#}
+                                <div style="max-width: 450px; max-height: 150px; font-size: 15px; margin-bottom: 65px;">
+                                    {{mars_info.Mars_Planet_Profile|safe}}
+                                </div>
+{#                            </ul>#}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container-fluid">
+                    <H3 style="text-align: center;">Mars Hemispheres</H3>
+                    <div class="body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            {% for hemisphere in data.Hemisphere_Description[0:2] %}
+
+                            <img src="{{hemisphere['img_url']}}" alt="hemisphere" style="width:50%;">
+                            <div class="caption" style="font-weight: bold;">
+                                {{hemisphere['title']}}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            {% for hemisphere in data.Hemisphere_Description[2:4] %}
+
+                            <img src="{{hemisphere['img_url']}}" alt="hemisphere" style="width:50%;">
+                            <div class="caption" style="font-weight: bold;">
+                                {{hemisphere['title']}}
+                            </div>
+                            {% endfor %}
+
+
+                        </div>
+                    </div>
+                    </div>
+
+                </div>
+
+
+                {% endfor %}
+
+            </div>
+
+{#        </div>#}
+
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
+</body>
+</html>
