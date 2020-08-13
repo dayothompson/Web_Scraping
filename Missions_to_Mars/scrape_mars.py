@@ -2,8 +2,6 @@
 from bs4 import BeautifulSoup
 import pandas as pd
 from splinter import Browser
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 import time
 import warnings
 import requests
@@ -19,7 +17,7 @@ def init_browser():
 
 
 def scrape_latest_details():
-    # Initialize browser
+
     browser = init_browser()
     mars_data = {}
 
@@ -44,13 +42,6 @@ def scrape_latest_details():
     # Store scrapped data
     mars_data['news_title'] = news_title
     mars_data['news_article'] = news_p
-
-    # return mars_data
-
-
-# def scrape_featured_image():
-#     # Path to the chromedriver
-#     browser = init_browser()
 
     # Visit JPL Featured Space Image url
     url = 'https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars'
@@ -79,14 +70,7 @@ def scrape_latest_details():
     # Store scrapped data
     mars_data['featured_image_url'] = featured_image_url
 
-    # return mars_data
-
-
-# def scrape_latest_tweet():
-#     # Path to the chromedriver
-#     browser = init_browser()
-
-    # Path to the chromedriver
+    # Visit Mars twitter page
     url = 'https://twitter.com/marswxreport?lang=en'
     browser.visit(url)
     time.sleep(5)
@@ -99,23 +83,18 @@ def scrape_latest_details():
     time.sleep(5)
 
     # Find all tweets
-    twitter = tweet_soup.find_all('span')
+    twitter = tweet_soup.find_all('div', lang='en')
     time.sleep(5)
+    # twitter
 
-    # Select first tweet in all tweets
-    for tweet in twitter:
-        if tweet.text != '' and 'InSight' in tweet.text:
-            break
+    # Latest tweet
+    latest = twitter[0].text
+    time.sleep(2)
 
-        # Store scrapped data
-        mars_data['latest_tweet'] = tweet.text
+    # Store scrapped data
+    mars_data['latest_tweet'] = latest
 
-#     return mars_data
-#
-#
-# def scrape_facts():
-
-    # Path to the chromedriver
+    # Visit the space-facts website to retrieve facts about Mars
     url = 'https://space-facts.com/mars/'
 
     # Using Pandas to scrape the table on the website
@@ -131,15 +110,7 @@ def scrape_latest_details():
     # Store scrapped data
     mars_data['Mars_Planet_Profile'] = profile_html
 
-
-#     return mars_data
-#
-#
-# def scrape_hemi_image_urls():
-#     # Path to the chromedriver
-#     browser = init_browser()
-
-    # Path to the chromedriver
+    # Visit Astrology website
     url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
     browser.visit(url)
     time.sleep(5)
@@ -157,6 +128,7 @@ def scrape_latest_details():
     # Make an empty list to store the links
     hemi_image_urls = []
 
+    # Visit each website in "all_links" and click on Open button
     for i in all_links:
         browser.visit('https://astrogeology.usgs.gov' + i.a['href'])
         time.sleep(5)
@@ -169,17 +141,22 @@ def scrape_latest_details():
         # Parse HTML with Beautiful Soup
         hi_res_img_soup = BeautifulSoup(full_image, 'html.parser')
 
+        # Retrieve hemisphere titles and images
         all_hi_res_img = hi_res_img_soup('img', class_='wide-image')
         img_string = i.h3.text + str('.png')
         img_url = 'https://astrogeology.usgs.gov' + all_hi_res_img[0]['src']
         hemi_image_urls.append({"title": i.h3.text, "img_url": img_url})
 
+        # Open and save hemisphere image files
         response = requests.get(img_url, stream=True)
         with open(img_string, 'wb') as out_file:
             shutil.copyfileobj(response.raw, out_file)
         Image(url=img_string)
 
-        # Store scrapped data
+    # Close chrome browser
+    browser.quit()
+
+    # Store scrapped data
     mars_data['Hemisphere_Description'] = hemi_image_urls
 
     return mars_data

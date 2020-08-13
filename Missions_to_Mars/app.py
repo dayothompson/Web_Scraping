@@ -1,42 +1,37 @@
 # Import dependencies
-import sys
 from flask import Flask, render_template, redirect
-# from flask_pymongo import PyMongo
-from pymongo import MongoClient
+from flask_pymongo import PyMongo
 from Missions_to_Mars import scrape_mars
 
-
-sys.setrecursionlimit(2000)
+# Create an instance of Flask
 app = Flask(__name__)
 
-# app.config['MONGO_URI'] = "mongodb://localhost:27017/mars_app"
-# mongo = PyMongo(app)
+# Use PyMongo to establish Mongo connection
+app.config['MONGO_URI'] = "mongodb://localhost:27017/mars_app"
+mongo = PyMongo(app)
 
 
-conn = "mongodb://localhost:27017"
-client = MongoClient(conn)
-
-db = client.mars_app
-
-# Drop collection if exists
-db.mars_data.drop()
-
-
-collection = db.mars_data
-
-
+# Route to render index.html template using data from Mongo
 @app.route("/")
 def index():
-    data = collection.find()
-    return render_template("index.html", data=data)
+    # Find one record of data from the mongo database
+    mars_info = mongo.db.collection.find_one()
+
+    # Return template and data
+    return render_template("index.html", mars_info=mars_info)
 
 
+# Route that will trigger the scrape function
 @app.route("/scrape")
 def scrape():
-    data = collection
+
+    # variable name where scraped data is stored
     mars_data = scrape_mars.scrape_latest_details()
-    # collection.insert_many(mars_data)
-    data.update({}, mars_data, upsert=True)
+
+    # Run the scrape function
+    mongo.db.collection.update({}, mars_data, upsert=True)
+
+    # Redirect back to home page
     return redirect("/", code=302)
 
 
